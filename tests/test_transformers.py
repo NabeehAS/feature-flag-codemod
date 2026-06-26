@@ -11,3 +11,15 @@ def test_if_removal_false():
     expected = "x = 2"
     result = apply_mutation(source, "FF_ACTIVE", False)
     assert result.strip() == expected.strip()
+
+def test_if_removal_no_else_true():
+    source = "if FF_ACTIVE:\n    x = 1\nprint('done')" 
+    expected = "x = 1\nprint('done')"
+    result = apply_mutation(source, "FF_ACTIVE", True)
+    assert result.strip() == expected.strip()
+
+def test_if_removal_no_else_false():
+    source = "if FF_ACTIVE:\n    x = 1\nprint('done')"
+    expected = "print('done')"
+    result = apply_mutation(source, "FF_ACTIVE", False)
+    assert result.strip() == expected.strip()
