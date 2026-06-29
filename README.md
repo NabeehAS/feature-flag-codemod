@@ -1,4 +1,5 @@
-# 🧹 AI-Powered Feature Flag Undertaker
+# 🧹 Feature Flag Codemod
+> **Project Codename:** AI-Powered Feature Flag Undertaker
 
 > **Status:** 🚧 Active Development (V1 – CLI + Deterministic LibCST Engine)
 
