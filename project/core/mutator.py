@@ -50,6 +50,16 @@ class FeatureFlagRemover(cst.CSTTransformer):
                     
         return updated_node
 
+    def leave_IfExp(self, original_node: cst.IfExp, updated_node: cst.IfExp) -> Union[cst.CSTNode, cst.RemovalSentinel]:
+        if m.matches(original_node.test, m.Name(value=self.target_flag)):
+            if self.flag_state:
+                # Flag is True: Replace "A if Flag else B" with "A"
+                return updated_node.body
+            else:
+                # Flag is False: Replace "A if Flag else B" with "B"
+                return updated_node.orelse
+        return updated_node
+
 def apply_mutation(source_code: str, flag_name: str, flag_state: bool) -> str:
     module = cst.parse_module(source_code)
     transformer = FeatureFlagRemover(flag_name, flag_state)
