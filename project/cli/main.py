@@ -3,13 +3,15 @@ import sys
 from enum import Enum
 from pathlib import Path
 
-# Import your V0 brain and V2 eyes
+# Import your V0 brain, V2 eyes, and V3 cleanup layer
+from project.core.cleanup import apply_cleanup
 from project.core.mutator import apply_mutation
 from project.discovery.scanner import RepoScanner
 
 
 class ProcessResult(str, Enum):
     """Represents the outcome of processing a single file."""
+
     MUTATED = "mutated"
     UNCHANGED = "unchanged"
     FAILED = "failed"
@@ -19,22 +21,26 @@ def process_file(file_path: Path, flag: str, state_bool: bool) -> ProcessResult:
     """
     Process a single Python file.
 
-    Returns:
-        ProcessResult.MUTATED if the file was changed.
-        ProcessResult.UNCHANGED if the flag was not found or no change was needed.
-        ProcessResult.FAILED if parsing, reading, writing, or mutation failed.
+    Important behavior:
+    - First apply the feature-flag mutation.
+    - If the mutation made no change, do not run cleanup.
+    - If the mutation changed the file, run import cleanup afterward.
     """
     try:
         original_source = file_path.read_text(encoding="utf-8")
-        new_source = apply_mutation(original_source, flag, state_bool)
+        mutated_source = apply_mutation(original_source, flag, state_bool)
 
-        # Optimization: only write to disk if the CST output actually changed something.
-        if original_source != new_source:
-            file_path.write_text(new_source, encoding="utf-8")
-            print(f"[*] Mutated: {file_path}")
-            return ProcessResult.MUTATED
+        # Do not cleanup unrelated files. This prevents the CLI from becoming
+        # a general-purpose import formatter when the target flag is absent.
+        if original_source == mutated_source:
+            return ProcessResult.UNCHANGED
 
-        return ProcessResult.UNCHANGED
+        cleaned_source = apply_cleanup(mutated_source)
+
+        file_path.write_text(cleaned_source, encoding="utf-8")
+        print(f"[*] Mutated: {file_path}")
+
+        return ProcessResult.MUTATED
 
     except Exception as e:
         print(f"[!] Failed {file_path}: {str(e)}", file=sys.stderr)
