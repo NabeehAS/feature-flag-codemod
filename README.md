@@ -115,8 +115,8 @@ Validated changes can be submitted automatically as GitHub Pull Requests.
 - [x] **V0** – Deterministic LibCST transformation engine
 - [x] **V1** – CLI for single-file transformations
 - [x] **V2** – Repository scanning
-- [ ] **V3** – Scope analysis & import cleanup
-- [ ] **V4** – Automated pytest validation
+- [x] **V3** – Scope analysis & import cleanup
+- [x] **V4** – Automated pytest validation
 - [ ] **V5** – Docker sandbox
 - [ ] **V6** – GitHub Pull Request automation
 - [ ] **V7** – AI-assisted feature flag discovery
