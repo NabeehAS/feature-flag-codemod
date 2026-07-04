@@ -94,8 +94,6 @@ Validated changes can be submitted automatically as GitHub Pull Requests.
 
 ## 🛠️ Tech Stack
 
-### Current
-
 - Python 3.12+
 - LibCST
 - argparse
