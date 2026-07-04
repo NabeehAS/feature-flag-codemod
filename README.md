@@ -1,7 +1,7 @@
 # 🧹 Feature Flag Codemod
 > **Project Codename:** AI-Powered Feature Flag Undertaker
 
-> **Status:** 🚧 Active Development (V1 – CLI + Deterministic LibCST Engine)
+> **Status:** 🚧 Active Development
 
 An autonomous platform for deterministically removing deprecated feature flags from Python codebases.
 
@@ -100,9 +100,6 @@ Validated changes can be submitted automatically as GitHub Pull Requests.
 - LibCST
 - argparse
 - pytest
-
-### Planned
-
 - Docker SDK for Python
 - PyGithub
 - OpenAI API
@@ -117,7 +114,7 @@ Validated changes can be submitted automatically as GitHub Pull Requests.
 - [x] **V2** – Repository scanning
 - [x] **V3** – Scope analysis & import cleanup
 - [x] **V4** – Automated pytest validation
-- [ ] **V5** – Docker sandbox
+- [x] **V5** – Docker sandbox
 - [ ] **V6** – GitHub Pull Request automation
 - [ ] **V7** – AI-assisted feature flag discovery
 - [ ] **V8** – Production pipeline orchestration
