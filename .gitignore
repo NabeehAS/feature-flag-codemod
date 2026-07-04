@@ -9,3 +9,5 @@ __pycache__/
 
 # Pytest
 .pytest_cache/
+
+manual_smoke_repo/

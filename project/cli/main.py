@@ -9,6 +9,7 @@ from project.core.cleanup import apply_cleanup
 from project.core.mutator import apply_mutation
 from project.discovery.scanner import RepoScanner
 from project.validation.runner import LocalTestRunner
+from project.validation.sandbox import DockerSandboxRunner
 
 
 class ProcessResult(str, Enum):
@@ -74,16 +75,32 @@ def rollback_files(original_sources: Dict[Path, str]) -> None:
         print(f"[rollback] Restored: {file_path}")
 
 
-def run_validation(repo_root: Path, timeout_seconds: int) -> bool:
-    """Run the repository's pytest suite."""
-    print(f"Running validation from: {repo_root}")
+def run_validation(
+    repo_root: Path,
+    timeout_seconds: int,
+    use_sandbox: bool,
+    docker_image: str,
+) -> bool:
+    """Run the repository's pytest suite locally or inside Docker."""
+    if use_sandbox:
+        print(f"Running sandbox validation from: {repo_root}")
 
-    runner = LocalTestRunner(
-        repo_root=repo_root,
-        timeout_seconds=timeout_seconds,
-    )
+        runner = DockerSandboxRunner(
+            repo_root=repo_root,
+            image=docker_image,
+            timeout_seconds=timeout_seconds,
+        )
 
-    result = runner.run()
+        result = runner.run_tests()
+    else:
+        print(f"Running local validation from: {repo_root}")
+
+        runner = LocalTestRunner(
+            repo_root=repo_root,
+            timeout_seconds=timeout_seconds,
+        )
+
+        result = runner.run()
 
     if result.output:
         print(result.output)
@@ -148,6 +165,19 @@ def main() -> None:
     )
 
     parser.add_argument(
+    "--sandbox",
+    action="store_true",
+    help="Run validation inside a restricted Docker container. Requires --validate.",
+)
+
+    parser.add_argument(
+        "--docker-image",
+        type=str,
+        default="feature-flag-undertaker-sandbox:py312",
+        help="Docker image to use for sandbox validation.",
+    )
+
+    parser.add_argument(
         "--repo-root",
         type=Path,
         help=(
@@ -178,6 +208,9 @@ def main() -> None:
     )
 
     args = parser.parse_args()
+    if args.sandbox and not args.validate:
+        sys.exit("Error: --sandbox requires --validate.")
+
     state_bool = args.state == "true"
 
     original_sources: Dict[Path, str] = {}
@@ -255,6 +288,8 @@ def main() -> None:
         validation_passed = run_validation(
             repo_root=validation_root,
             timeout_seconds=args.timeout_seconds,
+            use_sandbox=args.sandbox,
+            docker_image=args.docker_image,
         )
 
         if not validation_passed:

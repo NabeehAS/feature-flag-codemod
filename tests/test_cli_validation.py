@@ -171,3 +171,27 @@ def test_cli_file_mode_validate_uses_explicit_repo_root(tmp_path):
 
     assert "OLD_FLAG" not in updated_source
     assert "Validation passed." in result.stdout
+
+def test_cli_rejects_sandbox_without_validate(tmp_path):
+    repo = tmp_path / "repo"
+    repo.mkdir()
+
+    app_file = repo / "app.py"
+    app_file.write_text(
+        "if OLD_FLAG:\n"
+        "    run()\n",
+        encoding="utf-8",
+    )
+
+    result = run_cli(
+        "--dir",
+        str(repo),
+        "--flag",
+        "OLD_FLAG",
+        "--state",
+        "true",
+        "--sandbox",
+    )
+
+    assert result.returncode != 0
+    assert "--sandbox requires --validate" in result.stderr
