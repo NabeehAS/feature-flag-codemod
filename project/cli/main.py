@@ -168,7 +168,7 @@ def main() -> None:
     "--sandbox",
     action="store_true",
     help="Run validation inside a restricted Docker container. Requires --validate.",
-)
+    )
 
     parser.add_argument(
         "--docker-image",
