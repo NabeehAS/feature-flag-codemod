@@ -409,7 +409,7 @@ def test_import_cleanup_is_part_of_prepared_source(
 ):
     app = tmp_path / "app.py"
 
-    app.write_text(
+    app.write_bytes(
         (
             "from service import "
             "new_handler, old_handler\n\n"
@@ -417,8 +417,7 @@ def test_import_cleanup_is_part_of_prepared_source(
             "    handler = new_handler\n"
             "else:\n"
             "    handler = old_handler\n"
-        ),
-        encoding="utf-8",
+        ).encode("utf-8")
     )
 
     original = app.read_bytes()
